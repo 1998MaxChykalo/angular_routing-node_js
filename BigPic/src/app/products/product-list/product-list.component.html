@@ -1,0 +1,28 @@
+
+<section class="product-list">
+  <div class="container">
+    <div class="product-list__container">
+      <div class="card" *ngFor="let product of products">
+        <img class="card-img-top" src="{{product.imageUrl}}" alt="Card image cap">
+        <div class="card-body">
+          <h5 class="card-title">{{ product.productName }}</h5>
+          <p class="card-text">{{ product.description }}</p>
+          <p class="card-text">{{ product.price | currency }}</p>
+          <p class="card-text">Star rating: <app-star [rating]="product.starRating"></app-star>
+          </p>
+        </div>
+        <div class="card-body" *ngIf='product.tags.length'>
+          <p class="card-text">Product tags: </p>
+          <ul class="list-group list-group-flush">
+            <li class="list-group-item" *ngFor='let tag of product.tags'>{{ tag }}</li>
+          </ul>
+        </div>
+        <div class="card-body">
+          <a [routerLink]="[product.id]" class="btn btn-success card-link">Details</a>
+          <a [routerLink]="[product.id, 'edit']" class="btn btn-primary card-link">Edit</a>
+          <a (click)="delete(product.id)" class="btn btn-danger card-link">Delete</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
