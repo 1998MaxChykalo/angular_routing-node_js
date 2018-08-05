@@ -1,61 +1,112 @@
 const PRODUCTS = require('./../data/products');
 const express = require('express');
 const router = express.Router();
-const Product = require('./../models/product');
+const mongoose = require('mongoose');
 const removeProduct = require('./../services/products').removeItem;
 
+const Product = require('./../models/product');
+
 router.get('/', (req, res, next) => {
-    res.status(200).json([
-        ...PRODUCTS,
-    ]);
-    next();
+    Product.find()
+        .exec()
+        .then(docs => {
+            console.log(docs);
+            res.status(200).json(docs)
+        })
+        .catch(err => {
+            console.log(err);
+            res.status(500).json({
+                error: err
+            })
+        });
 });
 
 router.post('/', (req, res, next) => {
-    console.log(req.body.name);
-    PRODUCTS.push(new Product(req.body));
-    res.status(201).json({
-        PRODUCTS,
+    const product = new Product({
+        _id: new mongoose.Types.ObjectId(),
+        name: req.body.name,
+        price: req.body.price
     });
-    next();
+    product
+        .save()
+        .then(result => {
+            console.log(result);
+            res.status(201).json({
+                createdProduct: result 
+            });
+        })
+        .catch(err => {
+            console.log(err);
+            res.status(500).json({
+                error: err
+            })
+        });
 });
 
 router.get('/:productId', (req, res, next) => {
-    const productId = req.params.productId;
-    const product = PRODUCTS.find((product) => product.id == productId )
-    res.status(200).json(product);
-    next();
+    const id = req.params.productId;
+    Product.findById(id)
+        .exec()
+        .then(doc => {
+            console.log(doc);
+            if (doc) {
+                res.status(200).json(doc);
+            } else {
+                res.status(404).json({
+                    message: "No valid entry found on provided ID"
+                });
+            }
+        })
+        .catch(err => {
+            console.log(err);
+            res.status(500).json({
+                error: err
+            });
+        });
 });
 
 router.put('/', (req, res, next) => {
     console.log('loh');
-    next();
+    // next();
 })
 
 router.patch('/:productId', (req, res, next) => {
-    const productId = req.params.productId;
-    console.log(productId);
-    const productIndex = PRODUCTS.findIndex((prod) => prod.id == productId);
-    console.log(productId,PRODUCTS);    
-    const editedProduct = new Product({
-        id: req.body.id || PRODUCTS[productIndex].id,        
-        productName: req.body.productName || PRODUCTS[productIndex].productName,
-        price: req.body.price || PRODUCTS[productIndex].price,
-    });
-    PRODUCTS[productIndex] = editedProduct;
-    res.status(200).json({
-        newProduct: editedProduct
-    });
-    next();
+    const _id = req.params.productId
+    const updateOps = {};
+    for (let ops of req.body) {
+        updateOps[ops.propName] = ops.value;
+    }
+    Product.update({_id}, { $set: updateOps })
+        .exec()
+        .then(result => {
+            console.log(result);
+            res.status(200).json(result);
+        })
+        .catch(err => {
+            console.log(err);
+            res.status(500).json({
+                error: err
+            });
+        });
 });
 
 router.delete('/:productId', (req, res, next) => {
-    console.log();
-    
-    const productId = req.params.productId;
-    removeProduct(productId, PRODUCTS);    
-    res.status(200).json(PRODUCTS);
-    next();
+    const _id = req.params.productId;
+    Product.remove({_id})
+        .exec()
+        .then(result => {
+            res
+                .status(200)
+                .json(result)
+        })
+        .catch(err => {
+            console.log(res);
+            res.status(500)
+                .json({
+                    error: err
+                });
+        });
+    // next();
 });
 
 
