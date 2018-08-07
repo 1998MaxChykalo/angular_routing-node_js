@@ -7,6 +7,7 @@ const morgan = require('morgan');
 
 const productRoutes = require('./api/routes/products');
 const orderRoutes = require('./api/routes/orders');
+const userRoutes = require('./api/routes/user');
 
 mongoose.connect(`mongodb+srv://node-shop:${process.env.MONGO_ATLAS_PW}@node-rest-shop-dnrz8.mongodb.net/test?retryWrites=true`, {
     useNewUrlParser: true
@@ -33,6 +34,7 @@ app.use(morgan('dev'));
 app.use('/uploads', express.static('uploads'))
 app.use('/products', productRoutes);
 app.use('/orders', orderRoutes);
+app.use('/user', userRoutes);
 
 // if we didn't find a fitting route, return not found
 app.use((req, res, next) => {
