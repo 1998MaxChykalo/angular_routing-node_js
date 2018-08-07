@@ -1,6 +1,18 @@
-export default class Order {
-    constructor({ products, totalPrice }) {
-        this.products = products || [];
-        this.totalPrice = totalPrice;
+const mongoose = require('mongoose');
+const getRandomArbitrary = require('../services/shared');
+
+
+const orderSchema = mongoose.Schema({
+    _id: mongoose.Schema.Types.ObjectId,
+    product: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Product',
+        required: true,
+    },
+    quantity: {
+        type: Number,
+        default: 1,
     }
-}
+});
+
+module.exports = mongoose.model('Order', orderSchema);
