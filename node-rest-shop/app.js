@@ -30,7 +30,7 @@ app.use((req, res, next) => {
 
 // add logging 
 app.use(morgan('dev'));
-  
+app.use('/uploads', express.static('uploads'))
 app.use('/products', productRoutes);
 app.use('/orders', orderRoutes);
 
